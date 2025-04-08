@@ -1,0 +1,106 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+def ensureTokenHasReadPackages() {
+    try {
+        def proc = "gh auth status".execute()
+        proc.waitFor()
+        def statusOutput = proc.in.text
+        if (statusOutput.contains("read:packages") || statusOutput.contains("write:packages")) {
+            return
+        }
+        throw new GradleException()
+    } catch(Exception e) {
+        logger.warn("Failed to check token scopes via 'gh auth status'", e)
+        throw new GradleException("❌ Token does not have the required 'read:packages' scope. Please run: gh auth refresh --scopes \"read:packages\"")
+    }
+}
+
+def getGithubToken() {
+    def token = System.getenv("GITHUB_TOKEN")
+    if (!token) {
+        try {
+            def proc = "gh auth token".execute()
+            proc.waitFor()
+            token = proc.in.text.trim()
+        } catch (Exception e) {
+            logger.warn("Failed to get GitHub token via gh", e)
+        }
+    }
+    println("Token: ${token}")
+    if (token) {
+        println("Token: ${token[0..3]}${'*' * (token.length() - 9)}${token[-5..-1]}")
+    } else {
+        println("Token not found.")
+    }
+    return token ?: ""
+}
+
+
+def getGithubUser() {
+    def user = System.getenv("GITHUB_USER")
+    if (!user) {
+        try {
+            def proc = "gh api user --jq .login".execute()
+            proc.waitFor()
+            user = proc.in.text.trim()
+        } catch (Exception e) {
+            logger.warn("Failed to get GitHub username via gh", e)
+        }
+    }
+    println("Username: ${user}")
+    return user ?: ""
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/ERP-Modula/common-lib")
+        credentials {
+            username = System.getenv("GITHUB_USER") ?: getGithubUser()
+            password = System.getenv("GITHUB_TOKEN") ?: getGithubToken()
+        }
+    }
+}
+
+dependencies {
+    implementation 'com.modula:common-lib:1.0.11'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.4'
+
+    runtimeOnly 'org.postgresql:postgresql'
+
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

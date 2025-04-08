@@ -1,0 +1,23 @@
+name: Prepare image for deploy
+on:
+  push:
+    branches: [ main,dev ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          username: filimonsha
+#          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+          password: dckr_pat_UPPDnopDYvXNXuv51vrzt6ljx0c
+      - name: Build and push Docker image
+#        TODO Вставить название вашей интеграции в публикуемый образ
+        run: |
+          docker buildx build --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} --build-arg GITHUB_USER=${{ secrets.INTEGRATION_OWNER }} -t filimonsha/modula-core-builder .
+          docker push filimonsha/modula-core-builder
