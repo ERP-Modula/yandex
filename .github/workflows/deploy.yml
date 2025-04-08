@@ -15,7 +15,7 @@ jobs:
 #          username: ${{ secrets.DOCKER_HUB_USERNAME }}
           username: filimonsha
 #          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-          password: dckr_pat_UPPDnopDYvXNXuv51vrzt6ljx0c
+          password: ${{ secrets.DOCKER_TOKEN }}
       - name: Build and push Docker image
 #        TODO Вставить название вашей интеграции в публикуемый образ
         run: |
