@@ -1,0 +1,27 @@
+# === Gradle ===
+.gradle/
+build/
+
+# === Java ===
+*.class
+*.jar
+
+# === Generated ===
+build/
+src/main/generated/
+build/generated/
+
+# === IntelliJ ===
+.idea/
+*.iml
+
+# === VSCode ===
+.vscode/
+
+# === Logs and misc ===
+*.log
+*.tmp
+
+# === OS files ===
+.DS_Store
+Thumbs.db
