@@ -1,7 +1,7 @@
 package modula.platform.yandex.tracker.service;
 
 import lombok.RequiredArgsConstructor;
-import modula.platform.yandex.tracker.client.YandexTrackerClient;
+import modula.platform.yandex.tracker.client.YandexTrackerUserClient;
 import modula.platform.yandex.tracker.domain.Client;
 import modula.platform.yandex.tracker.domain.User;
 import modula.platform.yandex.tracker.repository.ClientRepository;
@@ -13,8 +13,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final YandexTrackerClient yandexTrackerClient;
-    private final ClientRepository clientRepository; // Допустим, он умеет искать org_id по userId
+    private final YandexTrackerUserClient yandexTrackerClient;
+    private final ClientRepository clientRepository;
 
     @Override
     public User getCurrentUser(UUID userId) {
