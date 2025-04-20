@@ -2,10 +2,7 @@ package modula.platform.yandex.tracker.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
 public abstract class YandexTrackerBaseClient {
@@ -22,7 +19,7 @@ public abstract class YandexTrackerBaseClient {
     protected HttpHeaders buildHeaders(String orgId) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "OAuth " + token);
-        headers.set("Content-Type", "application/json");
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-Org-ID", orgId);
         return headers;
     }
