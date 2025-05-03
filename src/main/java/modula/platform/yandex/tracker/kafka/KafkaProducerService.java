@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class KafkaProducerService {
-    //    @Value("yandex-tracker")
-    //    private String moduleName;
+
 
     @Value("${kafka.topics.workflow-executor-topic}")
     private String execTopicName;
@@ -20,4 +19,5 @@ public class KafkaProducerService {
     public void sendIntegrationOutputResult(ExecutorTask executorTask) {
         kafkaTemplate.send(execTopicName, executorTask);
     }
+
 }

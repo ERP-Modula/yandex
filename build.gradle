@@ -82,7 +82,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.modula:common-lib:1.0.30'
+    implementation 'com.modula:common-lib:1.0.54'
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
@@ -96,6 +96,7 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1'
 
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.postgresql:postgresql:42.7.3'
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 

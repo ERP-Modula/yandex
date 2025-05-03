@@ -5,8 +5,6 @@ import modula.platform.yandex.tracker.user.client.YandexTrackerUserClient;
 import modula.platform.yandex.tracker.user.domain.User;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {

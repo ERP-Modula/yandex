@@ -20,7 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/me/{userId}")
+    @GetMapping("/myself")
     public ResponseEntity<User> getCurrentUser(@PathVariable String orgID) {
         User currentUser = userService.getCurrentUser(orgID);
         return ResponseEntity.ok(currentUser);
