@@ -1,9 +1,13 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/yandex_db
+    url: jdbc:postgresql://localhost:5432/modula
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
+  sql:
+    init:
+      mode: always
+    data-locations: classpath:yandex-tracker/migrations/changelog
 
   jpa:
     hibernate:

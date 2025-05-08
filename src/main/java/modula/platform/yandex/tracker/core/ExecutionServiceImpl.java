@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.modula.common.domain.workflow.execution.events.IntegrationTask;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import modula.platform.yandex.tracker.YandexTrackerModule;
+import modula.platform.yandex.tracker.common.BaseIntegrationModule;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 
@@ -11,39 +13,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ExecutionServiceImpl implements ExecutionService{
     private final ObjectMapper objectMapper = new ObjectMapper();
+    BaseIntegrationModule yandexTrackerModule = new YandexTrackerModule();
 
     @Transactional
     public void executeCommand(IntegrationTask task) {
-        String actionName = task.getActionName();
-//        Map<String, String> params = task.getParams();
-//        IntegrationOutputObject outputObject = new IntegrationOutputObject();
-//
-//        try {
-//            switch (actionName) {
-//
-//                //TODO cases by action name
-//                case "listFiles":
-//                    // for example
-////                    List<File> out = googleDocsService.getDocumentsFromFolder(mapParamsToActionArgument(params, ListDocumentsRequest.class));
-////                    outputObject = mapOutToIntegrationOutputObject(out, actionName);
-//                    break;
-//                default:
-//                    throw new IllegalArgumentException("action with name \"" + actionName + "\" doesn't exist");
-//            }
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-//
-//        outputObject.setStepId(task.getStepId());
-//
-//        ExecutorTask executorTask = ExecutorTask.builder()
-//                .workflowInstanceId(task.getWorkflowInstanceId())
-//                .isFirstStep(false)
-//                .integrationOutput(outputObject)
-//                .build();
-//
-//        kafkaProducerService.sendIntegrationOutputResult(executorTask);
+        Object object = yandexTrackerModule.executeAction(task.getActionName(), task.getParams());
+        System.out.println(object);
     }
+
     @Transactional
     private void subscribeOnWebhook(){
 
@@ -52,23 +29,4 @@ public class ExecutionServiceImpl implements ExecutionService{
     private <T> T mapParamsToActionArgument(Map<String, String> params, Class<T> c) {
         return objectMapper.convertValue(params, c);
     }
-
-//    private <C> IntegrationOutputObject mapOutToIntegrationOutputObject(List<C> out, String actionName) throws InvocationTargetException, IllegalAccessException {
-//        ModuleConfiguration configuration = apiManagerService.getModuleInfo();
-//        ModuleAction action = configuration.getActions().stream().filter(a -> a.getName().equals(actionName)).findFirst().orElseThrow();
-//        List<OutputInterface> interfaces = action.getOutputInterface();
-//
-//        IntegrationOutputObject integrationOutputObject = new IntegrationOutputObject();
-//        integrationOutputObject.setModuleName(configuration.getName());
-//        List<OutputInterfaceField> fields = new ArrayList<>();
-//
-//        for (Object o: out) {
-//            List<OutputInterfaceField> mapped = ObjectToOutputInterfaceFieldMapper.mapObjectToFields(interfaces, o, true);
-//            fields.addAll(mapped);
-//        }
-//
-//        integrationOutputObject.setFields(fields);
-//
-//        return integrationOutputObject;
-//    }
 }

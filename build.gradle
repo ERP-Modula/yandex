@@ -18,13 +18,12 @@ def ensureTokenHasReadPackages() {
         def proc = "gh auth status".execute()
         proc.waitFor()
         def statusOutput = proc.in.text
-        if (statusOutput.contains("read:packages") || statusOutput.contains("write:packages")) {
-            return
+        if (!statusOutput.contains("read:packages") && !statusOutput.contains("write:packages")) {
+            throw new GradleException("❌ GitHub token lacks 'read:packages' scope.\nRun: gh auth refresh --scopes \"read:packages\"")
         }
-        throw new GradleException()
-    } catch(Exception e) {
+    } catch (Exception e) {
         logger.warn("Failed to check token scopes via 'gh auth status'", e)
-        throw new GradleException("❌ Token does not have the required 'read:packages' scope. Please run: gh auth refresh --scopes \"read:packages\"")
+        throw new GradleException("Unable to verify GitHub token. Please run: gh auth refresh --scopes \"read:packages\"")
     }
 }
 
@@ -39,15 +38,14 @@ def getGithubToken() {
             logger.warn("Failed to get GitHub token via gh", e)
         }
     }
-    println("Token: ${token}")
     if (token) {
-        println("Token: ${token[0..3]}${'*' * (token.length() - 9)}${token[-5..-1]}")
+        def masked = "${token[0..3]}${'*' * (token.length() - 9)}${token[-5..-1]}"
+        println("GitHub token loaded: ${masked}")
     } else {
-        println("Token not found.")
+        println("GitHub token not found.")
     }
     return token ?: ""
 }
-
 
 def getGithubUser() {
     def user = System.getenv("GITHUB_USER")
@@ -60,7 +58,7 @@ def getGithubUser() {
             logger.warn("Failed to get GitHub username via gh", e)
         }
     }
-    println("Username: ${user}")
+    println("GitHub username: ${user ?: 'not found'}")
     return user ?: ""
 }
 
@@ -75,44 +73,48 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/ERP-Modula/common-lib")
         credentials {
-            username = System.getenv("GITHUB_USER") ?: getGithubUser()
-            password = System.getenv("GITHUB_TOKEN") ?: getGithubToken()
+            username = getGithubUser()
+            password = getGithubToken()
         }
     }
 }
 
 dependencies {
-    implementation 'com.modula:common-lib:1.0.54'
-
+    // Core Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.4'
-
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'
-
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1'
-
-    implementation 'org.springframework.kafka:spring-kafka'
-    implementation 'org.postgresql:postgresql:42.7.3'
-
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.4.4'
+    implementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1'
+    //implementation 'org.liquibase:liquibase-core'
 
+    // External libs
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.5-alpha1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6'
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+
+    // DB
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'com.h2database:h2'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    implementation 'com.h2database:h2'
-
-    runtimeOnly 'org.postgresql:postgresql'
-
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    // MapStruct processor
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Internal libs
+    implementation 'com.modula:common-lib:1.0.54'
 
+    // Test
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:kafka'
+    testImplementation 'org.mockito:mockito-core'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {

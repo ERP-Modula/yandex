@@ -15,11 +15,9 @@ public class KafkaConsumerService {
 
     @KafkaListener(
             id = "consumer-group-2",
-            //TODO вторая часть имени топика (совпадает с названием приложения в конфигурации в БД)
-            topics = "integration-task-" + "yandexTracker"
+            topics = "integration-task-yandex-tracker"
     )
     public void handleTask(@Payload IntegrationTask task) {
         executionService.executeCommand(task);
     }
-
 }
